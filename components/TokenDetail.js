@@ -1,312 +1,228 @@
-import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
-import axios from 'axios'; // Import the axios library
-import Head from 'next/head';
-import styles from './TokenDetail.module.css';
-import TokenPools from './TokenPools';
-import { useTable } from 'react-table';
-import TokenValueCalculator from './TokenValueCalculator';
-import PieChart from './PieChart';
-import MutualToken from './MutualToken';
-import OHLCV from './OHLCV';
+import axios from 'axios';
+import Chart from 'chart.js/auto';
+import styles from '../styles/TokenDetail.module.css';
 
-const TokenDetail = () => {
-
-  if (typeof window === 'undefined') {
-    return null; // or some placeholder if needed
-  }
-
-  const router = useRouter();
-  const { baseTokenAddress } = router.query;
-  const [tdetail, settdetail] = useState(null);
-  const [combinedData, setCombinedData] = useState([]);
-  const [percentageData, setPercentageData] = useState([]);
-  const [holders20, setHolder20] = useState([]);
-  const [tokenData, setTokenData] = useState([]);
-  const myAddress = "0x4e6FB88e48711d9f692942304D48A3aFc843e99A";
-
-  // console.log(tdetail);
+const TokenDetail = ({ tokenName, activeTab, onClose, baseTokenAddress }) => {
+  const [tokenDetail, setTokenDetail] = useState(null);
+  const [myPosition, setMyPosition] = useState(null);
+  const [firstTransfer, setFirstTransfer] = useState('');
+  const [lastTransfer, setLastTransfer] = useState('');
+  const [holderData, setHolderData] = useState(null);
+  const [chart, setChart] = useState(null);
+  const walletAddress = "0x4e6FB88e48711d9f692942304D48A3aFc843e99A";  
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        if (!baseTokenAddress) return;
 
-        const getMyPosition = await axios.get(
-          "https://wallettrackerbackend.onrender.com/getMyPosition",
-          {
-            params: { baseTokenAddress },
-          }
-        );
+      
+        const transferResponse = await axios.get("http://localhost:5003/transfers", {
+          params: { tokenAddress: baseTokenAddress, walletAddress: "0x4e6FB88e48711d9f692942304D48A3aFc843e99A" }
+        });
 
-        console.log(getMyPosition)
-        const myPositionData = getMyPosition.data.evmData;
+        const { firstTransfer, lastTransfer } = transferResponse.data;
+        setFirstTransfer(firstTransfer.timestamp);
+        setLastTransfer(lastTransfer.timestamp);
 
-        // Ensure myPositionData is not null or undefined
-        if (!myPositionData) {
-          console.error('Error: Unable to fetch data');
-          return;
-        }
-
-
-        const tokenHolders = myPositionData.TokenHolders;
-
-        const selectedData = tokenHolders.slice(10, 42);
-        setHolder20(selectedData);
-        // console.log(selectedData);
-
-        // Ensure tokenHolders is not null or empty
-        if (!tokenHolders || tokenHolders.length === 0) {
-          console.error('Error: No token holders data available');
-          return;
-        }
-
-        // Calculate the total number of holders
-        const totalHolders = tokenHolders.length;
-
-        const allHolders = myPositionData.TokenHolders.map(holder => holder.Holder.Address);
-
-        const myLowercaseAddress = myAddress.toLowerCase();
-        const myPositionIndex = allHolders.findIndex(address => address.toLowerCase() === myLowercaseAddress);
-
-        // Define balance ranges
-        const range1 = { min: 0, max: 100 };
-        const range2 = { min: 100, max: 1000 };
-        const range3 = { min: 1000, max: 10000 };
-        const range4 = { min: 10000, max: 100000 };
-        const range5 = { min: 100000, max: 1000000 };
-        const range6 = { min: 1000000, max: 1000000 };
-
-        // Function to check if a balance falls within a range
-        const isBalanceInRange = (balance, range) => balance >= range.min && balance <= range.max;
-
-        // Count holders in each range
-        const holdersInRange1 = tokenHolders.filter(holder => isBalanceInRange(parseFloat(holder.Balance.Amount), range1)).length;
-        const holdersInRange2 = tokenHolders.filter(holder => isBalanceInRange(parseFloat(holder.Balance.Amount), range2)).length;
-        const holdersInRange3 = tokenHolders.filter(holder => isBalanceInRange(parseFloat(holder.Balance.Amount), range3)).length;
-        const holdersInRange4 = tokenHolders.filter(holder => isBalanceInRange(parseFloat(holder.Balance.Amount), range4)).length;
-        const holdersInRange5 = tokenHolders.filter(holder => isBalanceInRange(parseFloat(holder.Balance.Amount), range5)).length;
-        const holdersInRange6 = tokenHolders.filter(holder => isBalanceInRange(parseFloat(holder.Balance.Amount), range6)).length;
-        // Calculate the percentage distribution
-        const percentageInRange1 = (holdersInRange1 / totalHolders) * 100;
-        const percentageInRange2 = (holdersInRange2 / totalHolders) * 100;
-        const percentageInRange3 = (holdersInRange3 / totalHolders) * 100;
-        const percentageInRange4 = (holdersInRange4 / totalHolders) * 100;
-        const percentageInRange5 = (holdersInRange5 / totalHolders) * 100;
-        const percentageInRange6 = (holdersInRange6 / totalHolders) * 100;
-
-
-
-        // Log the results
-        console.log(`Percentage of holders with balance between ${range1.min} and ${range1.max}: ${percentageInRange1.toFixed(2)}%`);
-        console.log(`Percentage of holders with balance between ${range2.min} and ${range2.max}: ${percentageInRange2.toFixed(2)}%`);
-        console.log('My Address Index:', myPositionIndex);
-
-        const myBalance = myPositionIndex !== -1 ? parseFloat(tokenHolders[myPositionIndex].Balance.Amount) : 0;
-
-        // Check if myBalance is a valid number before applying toFixed
-        const balanceValue = isNaN(myBalance) ? 'N/A' : myBalance.toFixed(2);
-
-        const newDataArray = [
-          { label: 'Holders', value: totalHolders || 'Loading...' },
-          { label: 'holding 0-100', value: percentageInRange1 ? percentageInRange1.toFixed(2) + '%' : 'Calculating...' },
-          { label: 'holding 100-1k', value: percentageInRange2 ? percentageInRange2.toFixed(2) + '%' : 'Calculating...' },
-          { label: 'holding 1k-10k', value: percentageInRange3 ? percentageInRange3.toFixed(2) + '%' : 'Calculating...' },
-          { label: 'holding 10k-100k', value: percentageInRange4 ? percentageInRange4.toFixed(2) + '%' : 'Calculating...' },
-          { label: 'holding 100k-1mk', value: percentageInRange5 ? percentageInRange5.toFixed(2) + '%' : 'Calculating...' },
-          { label: 'holding 1m-10mk', value: percentageInRange6 ? percentageInRange6.toFixed(2) + '%' : 'Calculating...' },
-
-          { label: 'My Position', value: myPositionIndex !== -1 ? myPositionIndex.toFixed(2) + '.' : 'Calculating...' },
-          { label: `I'm holding:`, value: balanceValue }, // Add balance entry
-          // Add more entries as needed
-        ];
-        setTokenData(newDataArray);
-
-        const backendResponse = await axios.get(
-          "https://wallettrackerbackend.onrender.com/getweb3data",
-          {
-            params: { baseTokenAddress },
-          }
-        );
-
-        settdetail(backendResponse.data);
-
-        const percentageData = [
-          percentageInRange1,
-          percentageInRange2,
-          percentageInRange3,
-          percentageInRange4,
-          percentageInRange5,
-          percentageInRange6,
-        ];
-
-        setPercentageData(percentageData);
-
-
-
-
-
+        const geckoTerminalUrl = `https://api.geckoterminal.com/api/v2/networks/eth/tokens/${baseTokenAddress}`;
+        const tokenDetailResponse = await axios.get(geckoTerminalUrl);
+        setTokenDetail(tokenDetailResponse.data.data);
       } catch (error) {
         console.error('Error fetching data:', error);
       }
-
-
-
-      const combinedData = [...percentageData, ...tokenData];
-
-      const selectedData = combinedData.slice(7, 12);
-      setCombinedData(selectedData);
-
     };
 
-    if (baseTokenAddress) {
-      fetchData();
-    }
+    fetchData();
   }, [baseTokenAddress]);
 
+  useEffect(() => {
+    const handleResize = () => {
+      const chartContainer = document.querySelector('.' + styles.chartContainer);
+      if (chartContainer) {
+        const chartCanvas = document.getElementById('pie-chart');
+        chartCanvas.style.width = '100%';
+        chartCanvas.style.height = chartContainer.offsetHeight + 'px';
+      }
+    };
+  
+    window.addEventListener('resize', handleResize);
+    handleResize(); 
+  
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+  
 
+  useEffect(() => {
+    const fetchHolderData = async () => {
+      if (!baseTokenAddress || !tokenDetail) return;
+      try {
+        const holdersResponse = await axios.get("http://localhost:5003/holders", {
+          params: { contractAddress: baseTokenAddress }
+        });
 
-  const data = React.useMemo(
-    () =>
-      tokenData.map((dataEntry) => ({
-        label: dataEntry.label,
-        value: dataEntry.value,
-      })),
-    [tokenData]
-  );
+        const holderData = holdersResponse.data.map(holder => ({
+          address: holder.address,
+          balance: parseFloat(holder.balance),
+          holdingValue: parseFloat(holder.balance) * parseFloat(tokenDetail.attributes.price_usd)
+        }));
 
-  const columns = React.useMemo(
-    () => [
-      {
-        Header: '',
-        accessor: 'label', // accessor is the "key" in the data
-      },
-      {
-        Header: '',
-        accessor: 'value',
-      },
-    ],
-    []
-  );
+        setHolderData(holderData);
+        const index = holderData.findIndex(holder => holder.address.toLowerCase() === walletAddress.toLowerCase());
+        if (index !== -1) {
+          const myPositionDetail = holderData[index];
+          
+          setMyPosition(`${index + 1}`);
+        } else {
+          setMyPosition("You do not hold any tokens of this type.");
+        }
+      } catch (error) {
+        console.error('Error fetching holder data:', error);
+      }
+    };
+    fetchHolderData();
+  }, [baseTokenAddress, tokenDetail]);
 
-  const {
-    getTableProps,
-    getTableBodyProps,
-    headerGroups,
-    rows,
-    prepareRow,
-  } = useTable({ columns, data });
+  useEffect(() => {
+    if (holderData && holderData.length > 0) {
+      const categories = {
+        '1$ - 10$': 0,
+        '10$ - 100$': 0,
+        '100$ - 1K$': 0,
+        '1K$ - 10K$': 0,
+        '10K$ - 100K$': 0,
+        '100K$ - 1M$': 0,
+        '1M$+': 0
+      };
 
-  const tokenHoldersData = {
-    tokenHolders: holders20.map(holder => holder.Holder.Address),
-  };
-  // console.log(tokenHoldersData);
+      holderData.forEach(holder => {
+        const value = holder.holdingValue;
+        if (value < 10) categories['1$ - 10$'] += value;
+        else if (value < 100) categories['10$ - 100$'] += value;
+        else if (value < 1000) categories['100$ - 1K$'] += value;
+        else if (value < 10000) categories['1K$ - 10K$'] += value;
+        else if (value < 100000) categories['10K$ - 100K$'] += value;
+        else if (value < 1000000) categories['100K$ - 1M$'] += value;
+        else categories['1M$+'] += value;
+      });
+
+      const ctx = document.getElementById('pie-chart').getContext('2d');
+      if (chart) chart.destroy();
+      const newChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: Object.keys(categories),
+          datasets: [{
+            data: Object.values(categories),
+            backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#72a8d1', '#91c4c8', '#f09ae9', '#e9c8f0', '#8e9aaf', '#a0c0cf', '#ddd6f3']
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: 'top',
+            },
+            tooltip: {
+              mode: 'index',
+              intersect: false,
+            }
+          }
+        }
+      });
+      setChart(newChart);
+    }
+  }, [holderData]);
 
 
   return (
-    <>
-      <Head>
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        {/* Other head elements */}
-      </Head>
-
-      <div>
-
-  
-
-        {tokenData ? (
+    <div className={styles.overlay}>
+      <div className={styles.slider}>
+        <button className={styles.closeButton} onClick={onClose}>Close</button>
+        <h2>Token Details</h2>
+        {tokenDetail ? (
           <div>
-
-            <div className={styles.nutshellContainer}>
-              <div className={styles.gridItem}>
-                <h2>Token Holders Distribution</h2>
-                <table {...getTableProps()} className={styles.table1}>
-                  <thead>
-                    {headerGroups.map((headerGroup) => (
-                      <tr {...headerGroup.getHeaderGroupProps()}>
-                        {headerGroup.headers.map((column) => (
-                          <th {...column.getHeaderProps()}>{column.render('Header')}</th>
-                        ))}
-                      </tr>
-                    ))}
-                  </thead>
-                  <tbody {...getTableBodyProps()}>
-                    {rows.map((row) => {
-                      prepareRow(row);
-                      if (row.original.label === 'My Position' || row.original.label === "I'm holding:")
-                        return (
-                          <tr {...row.getRowProps()}>
-                            {row.cells.map((cell) => (
-                              <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
-                            ))}
-                          </tr>
-                        );
-                    })}
-                    <div className={styles.piecontainer}>
-                    <PieChart data={percentageData} tokenData={tokenData} />
-                    </div>
-                  </tbody>
-                </table>
-              </div>
-
-              {tdetail && (
-                <div className={styles.containerDetail}>
-                  <div className={styles.gridItem}>
-                    <table className={styles.table3}>
-                      <tbody>
-                        {tdetail.data.map((detail) => (
-                          <tr key={detail.key}>
-                            <th>{detail.key}</th>
-                            <td style={{ textAlign: 'right' }}>
-                              <span style={{ marginRight: '44%' }}>{"  "}</span>
-                              {detail.value}
-                            </td>
-                          </tr>
-                        ))}
-                      
-                      </tbody>
-                    </table>
-                    <div className={styles.TokenValueCalculator}>
-                          {tdetail && (
-                          <TokenValueCalculator
-                            pool={tdetail.data.find((item) => item.key === 'Pool Address')?.value}
-                          />
-                        )}
-                        </div>
-                  </div>
-                </div>
-              )}
-            </div>
-            {/*
+            <h2>{tokenDetail.attributes.name} ({tokenDetail.attributes.symbol})</h2>
+            <img src={tokenDetail.attributes.image_url} alt={tokenDetail.attributes.name} />
+            <table className={styles.tokenTable}>
+              <tbody>
+                <tr>
+                  <td>Price:</td>
+                  <td>${tokenDetail.attributes.price_usd}</td>
+                </tr>
+                <tr>
+                  <td>Address:</td>
+                  <td>{tokenDetail.attributes.address}</td>
+                </tr>
+                <tr>
+                  <td>Fully Diluted Valuation (FDV):</td>
+                  <td>${tokenDetail.attributes.fdv_usd}</td>
+                </tr>
+                <tr>
+                  <td>Total Supply:</td>
+                  <td>{parseFloat(tokenDetail.attributes.total_supply).toLocaleString()} {tokenDetail.attributes.symbol}</td>
+                </tr>
+                <tr>
+                  <td>Total Reserve in USD:</td>
+                  <td>${parseFloat(tokenDetail.attributes.total_reserve_in_usd).toLocaleString()}</td>
+                </tr>
+                <tr>
+                  <td>24h Volume USD:</td>
+                  <td>${parseFloat(tokenDetail.attributes.volume_usd.h24).toLocaleString()}</td>
+                </tr>
+                <tr>
+                  <td>Market Cap:</td>
+                  <td>${tokenDetail.attributes.market_cap_usd ? tokenDetail.attributes.market_cap_usd : 'Unavailable'}</td>
+                </tr>
+              </tbody>
+            </table>
             <div>
-        <OHLCV poolAddress={PoolAaddress}></OHLCV>
-    </div> */}
-            <div className={styles.container}>
-              {tdetail && (
-                <TokenPools
-                  // pairAddress={tdetail.data.find((item) => item.key === 'Pool Address')?.value}
-                  baseTokenAddress={baseTokenAddress} 
-                  PoolAaddress={tdetail.data.find((item) => item.key === 'Pool Address')?.value}
-                />
-              )}
+              <h3>Top Pools</h3>
+              <ul>
+                <td>
+                {tokenDetail.relationships.top_pools.data.map(pool => (
+                  <li key={pool.id}>{pool.id}</li>
+                ))}
+                </td>
+              </ul>
             </div>
-
-            
-   
-
-            <div className={styles.containerMutualtoken}>
-              <MutualToken
-                tokenHolders={{ tokenHoldersData }}
-              />
-            </div>
-
           </div>
         ) : (
-          <p>Loading...</p>
+          <p>Loading token details...</p>
         )}
-      </div>
-    </>
-  );
 
+
+        <div>
+          <h2>Transfer</h2>
+          <table className={styles.positionTable}>
+            <tbody>
+            <tr>
+                <td>MyPosition:</td>
+                <td>{myPosition}</td>
+              </tr>
+              <tr>
+                <td>LastTransfer:</td>
+                <td>{lastTransfer}</td>
+              </tr>
+              <tr>
+                <td>firstTransfer:</td>
+                <td>{firstTransfer}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div className={styles.chartContainer}>
+  <h2>Token Holding Distribution in USD</h2>
+  <canvas id="pie-chart"></canvas>
+</div>
+
+      </div>
+    </div>
+  );
 };
 
 export default TokenDetail;

@@ -1,0 +1,150 @@
+/* ShowFav.module.css */
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.slider {
+  background-color: #121213;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  width: 80%;
+  max-width: 800px;
+  max-height: 60%; /* Set maximum height */
+  overflow-y: auto; /* Add scrollbar when content overflows */
+  position: absolute;
+}
+
+
+.closeButton {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 20px;
+}
+
+.h2 {
+  margin-top: 0;
+}
+
+.tabs {
+  display: flex;
+  margin-bottom: 20px;
+}
+
+.tab {
+  background-color: #1b1a1e;
+  border: none;
+  padding: 10px 20px;
+  margin-right: 10px;
+  cursor: pointer;
+}
+
+.tab.active {
+  background-color: #363535;
+}
+
+/* ShowFav.module.css */
+.tableContainer table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tableContainer th,
+.tableContainer td {
+  padding: 8px; /* Adjust spacing as needed */
+  border-bottom: 1px solid #292323; /* Add bottom border */
+}
+
+.tableContainer th {
+  background-color: #262222; /* Add background color to header */
+}
+
+
+.th {
+  background-color: #f2f2f2;
+}
+
+.tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+.tr:hover {
+  background-color: #ddd;
+}
+
+/* Responsive table */
+@media (max-width: 768px) {
+  .tableContainer {
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  .table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .th, .td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+  }
+
+ .th {
+    background-color: #f2f2f2;
+  }
+
+  .tr:nth-child(even) {
+    background-color: #f2f2f2;
+  }
+
+  .tr:hover {
+    background-color: #ddd;
+  }
+}
+
+/* ShowFav.module.css */
+
+.hidden {
+  display: none;
+}
+
+.active {
+  background-color: #007bff; /* Change as needed for your design */
+  color: white;
+}
+
+/* Continue with other styles */
+.button {
+  background-color: #292828; /* Green */
+  border: none;
+  color: white;
+  padding: 4px 5px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 12px;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background-color 0.4s, color 0.4s, border 0.4s;
+}
+
+.button:hover {
+  background-color: #b61111; /* Darker green */
+  color: white;
+  border: 2px solid #040504; /* Darker green */
+}

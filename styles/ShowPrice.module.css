@@ -1,0 +1,220 @@
+/* Tab container */
+.tabContainer {
+  display: flex;
+}
+
+/* Main section */
+.main {
+  font-family: Arial, sans-serif; /* Change the font family to Arial */
+}
+
+/* Tab */
+.tab {
+  margin: 1px 20px;
+  padding: 10px 20px;
+  cursor: pointer;
+  background-color: #191B1F; /* Slightly lighter for contrast */
+  border: none;
+  border-bottom: 3px solid transparent;
+  border-radius: 5px 5px 0 0;
+  transition: background-color 0.3s, border-color 0.3s;
+}
+
+/* Active tab */
+.activeTab {
+  background-color: #252830;
+  /* border-color: #3d485b; */
+}
+.negativeChange {
+  color: red;
+}
+
+.positiveChange {
+  color: green;
+}
+
+/* Token table */
+.tokenTable {
+  width: 98%;
+  border-collapse: collapse;
+  margin: 1px 20px;
+}
+
+/* Table header */
+/* .tokenTable th {
+  background-color: #252830;
+  color: #9BAAC1;
+  padding: 20px;
+  text-align: right;
+  width: 20rem;
+  height: 5rem;
+  border-bottom: 1px solid #252830;
+  /* color: #a1475c;  */
+
+
+.tokenTable th {
+  background-color: #252830;
+  color: #9BAAC1;
+  width: 20rem;
+  height: 5rem;
+} 
+/* Table data */
+.tokenTable td {
+  /* border-bottom: 1px solid #302e2e; Only horizontal borders */
+  text-align: right;
+  border-bottom: 1px solid #252830;
+  padding: 20px;
+}
+
+
+
+.tokenContainer:hover {
+  background-color: #252525;
+}
+
+.name {
+  cursor: pointer; 
+  min-width: 200px;
+}
+
+.name:hover {
+  color: rgb(166, 166, 173); 
+}
+
+
+/* Amount column */
+.amount {
+  min-width: 100px;
+  text-align: right;
+}
+
+/* Balance span */
+.balance {
+  margin-left: 5px;
+  font-size: 0.8em;
+}
+
+/* Header */
+.header {
+  background-color: #333;
+  color: #fff;
+  padding: 20px;
+  text-align: center;
+}
+
+/* Background chart */
+.backgroundChart {
+  height: 100px; /* Adjust the height as needed */
+  background-color: #1b1717; /* Placeholder color for the background chart */
+  margin-bottom: 2px;
+  margin: 1px 20px;
+}
+
+/* Total portfolio value */
+.totalPortfolioValue {
+  font-size: 25px;
+  font-weight: bold;
+  color: #dfd8d8;
+  margin-bottom: 1px;
+  margin-top: 10px;
+}
+
+/* Search box */
+.searchBox {
+  margin: 1px 20px;
+  width: 50%;
+  display: flex;
+  align-items: center;
+}
+
+/* Search input */
+.searchInput {
+  padding: 10px;
+  flex-grow: 1;
+  border: 1px solid #14161b;
+  border-radius: 2px;
+}
+
+/* Search button */
+.searchButton {
+  background-color: #363434;
+  color: #3d485b;
+  border: none;
+  padding: 10px;
+  border-radius: 5px;
+  margin-left: 100px;
+  cursor: pointer;
+}
+
+/* Loading animation */
+.loadingAnimation {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+/* Loading animation SVG */
+.loadingAnimation svg {
+  animation: rotate 2s linear infinite;
+  width: 50px;
+  height: 50px;
+}
+
+/* Favorite button */
+.favoriteButton {
+  background-color: #605e5e;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+/* Favorite button hover effect */
+.favoriteButton:hover {
+  background-color: #1a0e0e;
+}
+
+/* Keyframe for loading animation */
+@keyframes rotate {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+
+/* Popup overlay */
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black background */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Popup content */
+.popup-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); /* Shadow effect */
+  max-width: 80%; /* Maximum width of the popup */
+  max-height: 80%; /* Maximum height of the popup */
+  overflow-y: auto; /* Enable vertical scrolling if content exceeds the height */
+}
+
+/* Close button */
+.popup-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  cursor: pointer;
+  font-size: 20px;
+  color: #888;
+}

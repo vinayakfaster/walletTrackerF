@@ -1,172 +1,252 @@
 import React, { useState, useEffect } from 'react';
-import { useWatchlist } from './WatchlistContext';
-import styles from './ShowPrice.module.css'; // Ensure the correct import path
+import styles from '../styles/ShowPrice.module.css'; // Ensure the correct import path
 import Link from 'next/link';
-import { useAccount } from 'wagmi';
-import { Illustration } from '@web3uikit/core';
+import LoginPage from './LoginPage';
+import { useAccount } from "wagmi";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
+import LoadingAnimation from './LoadingAnimation';
+import axios from 'axios';
+import TokenDetail from './TokenDetail';
 
-const ShowPrice = ({ data }) => {
-  const [tokens, setTokens] = useState(data || []);
-  const address = useAccount();
+
+const ShowPrice = ({ data, tokenPriceChange, bscdata, bsctokenPriceChange }) => {
+  const { address } = useAccount();
+  const [accountAddress, setAccountAddress] = useState('');
+
+  
+useEffect(() => {   
+    setAccountAddress(address);
+  }, []); 
+
+  const [activeTab, setActiveTab] = useState('etherScan');
   const [searchQuery, setSearchQuery] = useState('');
-  const { addToWatchlist, isTokenInWatchlist, removeFromWatchlist } = useWatchlist();
-  const [sortOrder, setSortOrder] = useState('asc');
-  const [sortKey, setSortKey] = useState(null);
-  console.log(tokens);
+  const { isConnected } = useAccount();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [showPopup, setShowPopup] = useState(false);
+  const [selectedToken, setSelectedToken] = useState(null);
 
-  const formatBalance = (balance) => {
-    if (balance < 1000) {
-      return balance.toFixed(2); // Keep two decimal places if less than 1000
-    } else if (balance < 1000000) {
-      return (balance / 1000).toFixed(2) + 'k'; // Convert to thousands
-    } else if (balance < 1000000000) {
-      return (balance / 1000000).toFixed(2) + 'M'; // Convert to millions
-    } else {
-      return (balance / 1000000000).toFixed(2) + 'B'; // Convert to billions
-    }
-  };
+  // console.log(bscdata)
 
   useEffect(() => {
-    // Update tokens when data changes
-    setTokens(data || []);
-  }, [data]);
-
-  const sortTokens = (key) => {
-    let sortedTokens = [...tokens];
-    let order = 'asc';
-
-    if (sortKey === key) {
-      // If clicking on the same column, reverse the order
-      order = sortOrder === 'asc' ? 'desc' : 'asc';
-    }
-
-    sortedTokens = sortedTokens.sort((a, b) => {
-      const valueA = key.split('.').reduce((obj, k) => obj[k], a);
-      const valueB = key.split('.').reduce((obj, k) => obj[k], b);
-
-      return order === 'asc' ? valueA - valueB : valueB - valueA;
-    });
-
-    setTokens(sortedTokens);
-    setSortOrder(order);
-    setSortKey(key);
-  };
-
-  const handleAddToFav = (tokenName) => {
-    if (isTokenInWatchlist(tokenName)) {
-      removeFromWatchlist(tokenName);
+    if (isConnected) {
+      setIsLoggedIn(true);
     } else {
-      addToWatchlist(tokenName);
+      setIsLoggedIn(false);
+    }
+  }, [isConnected]);
+
+  if (!isLoggedIn) {
+    return (
+      <div>
+        <LoadingAnimation size={50} stroke={4} speed={2} color="black" />
+      </div>
+    );
+  }
+
+  if (!data || !tokenPriceChange) {
+    return <div>Loading...</div>; 
+  }
+
+  // console.log(bsctokenPriceChange)
+  // console.log(tokenPriceChange)
+
+  const formatTokenBalanceinK = (balance, decimal) => {
+
+    balance = Number(balance);
+    const adjustedBalance = balance / Math.pow(10, decimal);
+    if (adjustedBalance >= 1000) {
+      return (adjustedBalance / 1000).toFixed(1) + 'k';
+    } else {
+      return adjustedBalance.toFixed(2);
     }
   };
 
-  // Utility function to convert Wei to Ether
-  const weiToEther = (wei) => {
-    const ether = wei / 1e18; // Assuming 1 Ether = 1e18 Wei
-    return ether.toFixed(4); // Adjust the precision as needed
+
+  const mergedDataBSC = bscdata.map(token => {
+    const matchingTokenPriceChange = bsctokenPriceChange.find(priceChange => priceChange.address === token.address);
+    return {
+      ...token,
+      priceChange: matchingTokenPriceChange || null
+    };
+  });
+
+
+  const mergedDataEtherScan = data.map(token => {
+    const matchingTokenPriceChange = tokenPriceChange.find(priceChange => priceChange.address === token.address);
+    return {
+      ...token,
+      priceChange: matchingTokenPriceChange || null
+    };
+  });
+
+  const mergedData = [...mergedDataEtherScan, ...mergedDataBSC];
+
+
+  // console.log(mergedData)
+  // console.log(mergedDataBSC)
+  const formatTokenBalance = (balance, decimal) => {
+    balance = Number(balance);
+    const adjustedBalance = balance / Math.pow(10, decimal);
+    return adjustedBalance.toFixed(2); 
   };
 
-  const normalizeTokenName = (token) => {
-    return token.name || token.symbol || 'Unknown';
-  };
+
+
+  const filteredData = activeTab === 'etherScan' ? mergedDataEtherScan : mergedDataBSC;
+  const filteredTokens = filteredData.filter(token => token.priceChange !== null && token.priceUsd !== null);
 
   const handleSearchInputChange = (event) => {
     setSearchQuery(event.target.value);
   };
 
-  const filteredTokens = tokens.filter((token) => {
-    const normalizedTokenName = normalizeTokenName(token).toLowerCase();
-    const normalizedSearchQuery = searchQuery.toLowerCase();
-    return normalizedTokenName.includes(normalizedSearchQuery);
-  });
-
+  const filteredTokensBySearch = filteredTokens.filter(token =>
+    token.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    token.symbol.toLowerCase().includes(searchQuery.toLowerCase())
+  ).map(token => ({
+    ...token,
+    holdingValue: formatTokenBalance(token.balance, token.decimals) * (Number(token.priceUsd) || 0)
+  })).sort((a, b) => b.holdingValue - a.holdingValue);
   
 
+  const totalHolding = filteredTokensBySearch.reduce((total, token) => total + Number(formatTokenBalance(token.balance, token.decimal)), 0);
 
+  const totalPortfolioValue = filteredTokensBySearch.reduce((total, token) => {
+    const tokenHolding = formatTokenBalance(token.balance, token.decimals) * (Number(token.priceUsd));
+    return total + tokenHolding;
+  }, 0);
+
+  // const handleAddToFav = (tokenName) => {
+  //   if (isTokenInWatchlist(tokenName)) {
+  //     removeFromWatchlist(tokenName);
+  //   } else {
+  //     addToWatchlist(tokenName);
+  //   }
+  // };
+
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+  };
+
+
+  // console.log(filteredTokensBySearch);
+
+  const handleAddToFav = async (tokenName, address) => {
+    try {
+      const response = await axios.get("http://localhost:5003/addFavToken", {
+        params: { userAddress: accountAddress, tokenName: tokenName, tokenAddress: address },
+      });
+      console.log(response);
+      if (response.data.success) {
+        
+        alert('Token added to favorites successfully!');
+      }
+    } catch (error) {
+      console.error("Error adding wallet address:", error);
+    }
+  };
+  
   return (
     <section className={styles.main}>
-      <div>
-        <input
-          type="text"
-          placeholder="Search tokens..."
-          value={searchQuery}
-          onChange={handleSearchInputChange}
-        />
+   
+      <header className={styles.header}>
+        <h1>Portfolio Overview</h1>
+      </header>
+      
+      <div className={styles.tabContainer}>
+        <div
+          className={`${styles.tab} ${activeTab === 'etherScan' ? styles.activeTab : ''}`}
+          onClick={() => handleTabChange('etherScan')}
+        >
+          ETHERScan
+        </div>
+        <div
+          className={`${styles.tab} ${activeTab === 'bscScan' ? styles.activeTab : ''}`}
+          onClick={() => handleTabChange('bscScan')}
+        >
+          BSCscan
+        </div>
+
+        <div className={styles.searchBox}>
+          <input
+            type="text"
+            placeholder="Search tokens..."
+            value={searchQuery}
+            onChange={handleSearchInputChange}
+            className={styles.searchInput}
+          />
+      
+        </div>
+        <div className={styles.totalPortfolioValue}>Portfolio Value ${totalPortfolioValue.toFixed(2)}</div>
       </div>
+
 
       <section className={styles.result}>
         <table className={styles.tokenTable}>
           <thead>
             <tr>
-              <th className={styles.name} onClick={() => sortTokens('name')}>
-                count
-              </th>
-              <th className={styles.amount} onClick={() => sortTokens('priceUsd')}>
-              Token Name
-              </th>
-              <th className={styles.name} onClick={() => sortTokens('tokenBalance')}>
-              Price USD
-              </th>
-              <th className={styles.amount} onClick={() => sortTokens('priceChange.m5')}>
-              Holding
-              </th>
-              <th className={styles.amount} onClick={() => sortTokens('priceChange.h1')}>
-                m5
-              </th>
-              <th className={styles.amount} onClick={() => sortTokens('priceChange.h6')}>
-                h1
-              </th>
-              <th className={styles.amount} onClick={() => sortTokens('priceChange.h24')}>
-                h6
-              </th>
-              <th className={styles.amount} onClick={() => sortTokens('priceChange.h24')}>
-                h24
-              </th>
-              <th>Actions</th>
-
+              <th className={styles.name}>Token Name</th>
+              <th className={styles.amount}>Price USD</th>
+              <th className={styles.amount}>Holding(value)</th>
+              <th className={styles.amount}>Holder Count</th>
+              <th className={styles.amount}>5m</th>
+              <th className={styles.amount}>1h</th>
+              <th className={styles.amount}>6h</th>
+              <th className={styles.amount}>24h</th>
+              <th className={styles.amount}>7d</th>
+              <th className={styles.amount}>Action</th>
             </tr>
-            
           </thead>
           <tbody>
-            {filteredTokens.map((token, index) => (
-              <tr className={styles.tokenContainer} key={index}>
-                {/* You may need to replace this part with your actual image */}
-                  <t>{index + 1}</t>
+  {filteredTokensBySearch.map((token, index) => (
+    <tr className={styles.tokenContainer} key={index}>
+      <td>
+        <p
+          className={styles.name}
+          onClick={() => {
+            setSelectedToken(token.address);
+            setShowPopup(true);
+          }}
+        >
+          {token.name || token.symbol || 'Unknown'}
+        </p>
+        <span className={styles.balance}>{formatTokenBalanceinK(token.balance, token.decimals)}</span>
+      </td>
+      <td className={styles.amount}>${Number(token.priceUsd || 'N/A').toFixed(4)}</td>
+      <td>${token.holdingValue.toFixed(2)}</td>
+                <td className={styles.amount}>{token.holdersCount || 'N/A'}</td>
+                <td className={`${styles.amount} ${token.priceChange?.priceChange?.m5 < 0 ? styles.negativeChange : (token.priceChange?.priceChange?.m5 > 0 ? styles.positiveChange : '')}`}>{token.priceChange?.priceChange?.m5 || '  '}</td>
+                <td className={`${styles.amount} ${token.priceChange?.priceChange?.h1 < 0 ? styles.negativeChange : (token.priceChange?.priceChange?.h1 > 0 ? styles.positiveChange : '')}`}>{token.priceChange?.priceChange?.h1 || '  '}</td>
+                <td className={`${styles.amount} ${token.priceChange?.priceChange?.h6 < 0 ? styles.negativeChange : (token.priceChange?.priceChange?.h6 > 0 ? styles.positiveChange : '')}`}>{token.priceChange?.priceChange?.h6 || '  '}</td>
+                <td className={`${styles.amount} ${token.price.diff < 0 ? styles.negativeChange : (token.price.diff > 0 ? styles.positiveChange : '')}`}>{token.price.diff || '  '}</td>
+                <td className={`${styles.amount} ${token.price.diff7d < 0 ? styles.negativeChange : (token.price.diff7d > 0 ? styles.positiveChange : '')}`}>{token.price.diff7d || '  '}</td>
+                <td className={styles.amount}>{token.priceChange?.pair?.pairAddress || '  '}</td>
                 <td>
-                  <Link href={`/TokenDetail?baseTokenAddress=${encodeURIComponent(token.baseTokenAddress)}`} passHref>
-                    <p className={styles.name}>{normalizeTokenName(token)}</p>
-                  </Link>
-                </td>
-                <td className={styles.amount}>{"$" + token.priceUsd}</td>
-                <td className={styles.amount}>{token.tokenBalance}</td>
-                <td className={`${styles.amount} ${token.priceChange.m5 >= 0 ? styles.positive : styles.negative}`}>
-                  {token.priceChange.m5 + '%'}
-                </td>
-                <td className={`${styles.amount} ${token.priceChange.h1 >= 0 ? styles.positive : styles.negative}`}>
-                  {token.priceChange.h1 + '%'}
-                </td>
-                <td className={`${styles.amount} ${token.priceChange.h6 >= 0 ? styles.positive : styles.negative}`}>
-                  {token.priceChange.h6 + '%'}
-                </td>
-                <td className={`${styles.amount} ${token.priceChange.h24 >= 0 ? styles.positive : styles.negative}`}>
-                  {token.priceChange.h24 + '%'}
-                </td>
-                <td>
-                  <button onClick={() => handleAddToFav(token.name)}>
-                    {isTokenInWatchlist(token.name) ? 'Remove from Watchlist' : 'Add to Watchlist'}
+                  <button className={styles.favoriteButton} onClick={() => handleAddToFav( token.name, token.address)} >
+                   {'Fav'}
                   </button>
                 </td>
+           
               </tr>
             ))}
+            {showPopup && selectedToken && (
+              <div className={styles.popup}>
+                <div className={styles.popupContent}>
+                  <TokenDetail
+                    baseTokenAddress={selectedToken}
+                    activeTab={activeTab}
+                    onClose={() => setShowPopup(false)}
+                  />
+                </div>
+              </div>
+            )}
+
+
           </tbody>
+
         </table>
       </section>
-      {/* <tr className={`${styles.tokenContainer} ${index % 2 === 0 ? styles.evenRow : styles.oddRow}`}>
-  </tr> */}
     </section>
-
-
   );
-};
+}
 
 export default ShowPrice;

@@ -1,0 +1,83 @@
+.tokenTable,
+.positionTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+.tokenTable td,
+.tokenTable th,
+.positionTable td,
+.positionTable th {
+  padding: 8px;
+  border-bottom: 1px solid #25212a;
+}
+
+.tokenTable th,
+.positionTable th {
+  text-align: left;
+  background-color: #f2f2f2;
+}
+
+/* Responsive styles */
+@media only screen and (max-width: 768px) {
+  .tokenTable,
+  .positionTable {
+    font-size: 10px; /* Decrease font size for smaller screens */
+  }
+}
+
+
+.chartContainer {
+  width: 100%;  /* Adjust this to fit your design needs */
+  height: 400px; /* This sets a fixed height, adjust as necessary */
+  margin: auto; /* Center the chart horizontally */
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center content vertically in the flex container */
+}
+
+.overlay {
+  position: fixed;
+  top: 46%;
+  left: 50%;
+  transform: translate(-40%, -40%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* z-index: 1000; */
+}
+
+.slider {
+  width: 100%; /* Adjust width as needed */
+  max-width: 700px; /* Maximum width of the slider */
+  background-color: #2c2c2d;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  animation: slideIn 0.3s ease forwards;
+  overflow-y: auto; /* Make the slider scrollable */
+  max-height: 80vh; /* Set maximum height to 80% of the viewport height */
+}
+
+.closeButton {
+  position: absolute;
+  top: 12px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  color: #f48a8a;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-50%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}

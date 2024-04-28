@@ -4,15 +4,17 @@ import Head from "next/head";
 import styles from "../styles/Home.module.css";
 
 import Header from "../components/header";
-import TokenDetail from "../components/TokenDetail";
+// import TokenDetail from "../components/TokenDetail";
 // import TokenPools from "../components/TokenPools";
 // import TokenValueCalculator from "../components/TokenValueCalculator";
 // import MutualToken from "../components/MutualToken";
-import Ohlcv from "../components/OHLCV";
+// import Ohlcv from "../components/OHLCV";
+import TransactionMonitor from "../components/TransactionMonitor";
+
 
 export default function Tokendetial() {
   return (
-
+<>
     <section className={styles.container}>
 
       <Head>
@@ -24,13 +26,9 @@ export default function Tokendetial() {
 
       <main className={styles.main}>
         <Header />
-        <TokenDetail>
-          {/* <Ohlcv> */}
-
-          {/* </Ohlcv> */}
-        </TokenDetail>
-        
+        {/* <TransactionMonitor /> */}
       </main>
     </section>
+    </>
   );
 }

@@ -1,52 +1,66 @@
 import { useEffect, useState } from "react";
 import axios from 'axios';
 import Price from "./Price"; 
-const styles = require("./LoggedIn.module.css");
-import { useAccount } from "wagmi";
+import LoginPage from "./LoginPage";
+import { useAccount } from "wagmi";  
 
 export default function LoggedIn() {
   const address = "0x4e6FB88e48711d9f692942304D48A3aFc843e99A";
-  const [balances, setBalances] = useState([]);
-  const [nativebalance, setnativebalance] = useState(null); 
+  // const {address } = useAccount();
   const [showResult, setShowResult] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [eth, setEth] = useState([]);
+  const [bsc, setBsc] = useState([]);
+
+  const { isConnected } = useAccount();
+
+  useEffect(() => {
+    if (isConnected) {
+      setIsLoggedIn(true);
+    } else {
+      setIsLoggedIn(false);
+    }
+  }, [isConnected]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Make the first request
         const response = await axios.get(
-          "https://wallettrackerbackend.onrender.com/getwalletbalance",
+          "http://localhost:5003/getwalletbalance",
           {
             params: { address },
           }
         );
-        console.log(response.data);
 
-       
-        setBalances(response.data.filteredTokenArray);
-        // setnativebalance(response2.data); 
+        setEth(response.data)
+  
+        const BSCresponse = await axios.get(
+          "http://localhost:5003/getBscWalletBalance",
+          {
+            params: { address },
+          }
+        );
+
+        setBsc(BSCresponse.data)
+
         setShowResult(true);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     };
-
+  
     fetchData();
-    
   }, [address]);
-
+  
   return (
     <>
-    <section className={styles.loggedIn_container}>
-      <p>Potfolio Data: ${JSON.stringify(nativebalance)}</p>
-
-      {showResult && balances.length > 0 && (
-        <>
-          <Price balances={balances} />
-     
-        </>
+      {isLoggedIn ? (
+        <section>
+          {showResult && bsc.length > 0 && <Price balances={eth} bscData={bsc} />}
+        </section>
+      ) : (
+        <LoginPage />
       )}
-    </section>
     </>
   );
 }

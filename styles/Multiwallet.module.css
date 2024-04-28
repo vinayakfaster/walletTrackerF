@@ -1,0 +1,123 @@
+/* Multiwallet.module.css */
+
+.popupContainer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.popup {
+  background-color: #191B1F;
+  padding: 20px;
+  border-radius: 8px;
+  width: 80vw; /* Full width of the viewport */
+  height: 80vh; /* Full height of the viewport */
+  max-width: 80%; /* Ensure it doesn't exceed the screen width */
+  max-height: 80%; /* Ensure it doesn't exceed the screen height */
+}
+
+.popupTabs {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.tab {
+  padding: 10px 20px;
+  background-color: transparent;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.tab:hover {
+  background-color: #191B1F;
+}
+
+.active {
+  background-color: #0070f3;
+  color: rgb(50, 48, 48);
+}
+
+.closeButton {
+  background-color: transparent;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.closeButton:hover {
+  background-color: #2c2323;
+}
+
+.tableContainer {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  border: 1px solid #191B1F;
+  padding: 8px;
+  text-align: left;
+}
+
+.table th {
+  background-color: #302323;
+}
+/* Multiwallet.module.css */
+.tableContainer {
+  max-height: 600px; /* Set maximum height for vertical scrolling */
+  overflow-y: auto; /* Enable vertical scrolling */
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  padding: 8px;
+  text-align: left;
+  border-bottom: 1px solid #312929;
+}
+
+.table th {
+  background-color: #25282e;
+}
+
+.tableRow:hover {
+  background-color: #191919;
+}
+.walletAddressesContainer {
+  display: flex;
+  flex-direction: column;
+}
+
+.walletAddress {
+  background-color: #222122;
+  /* border: 1px solid #ccc; */
+  border-radius: 5px;
+  padding: 10px 20px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: background-color 0.4s, border-color 0.4s;
+}
+
+.walletAddress:hover {
+  background-color: #1d1d1d;
+  border-color: #999;
+}

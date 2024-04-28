@@ -1,0 +1,124 @@
+/* Header */
+.header {
+  background-color: #191B1F;
+  padding: 20px;
+  text-align: center;
+  border: 1px solid #1d1b1b;
+  border-bottom: none;
+  border-radius: 5px 5px 0 0;
+  border-color: #3d485b;
+  border-left: #485a7b;
+  font-family: Arial, sans-serif; /* Change the font family to Arial */
+}
+
+.closeButton {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+/* Navigation */
+.nav {
+  display: flex;
+  justify-content: center;
+  margin: 100px 20px;
+  color: #fff; /* Changed text color to white */
+  background-color: #191B1F;
+}
+
+.nav ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.nav_li {
+  margin-right: 20px;
+  margin-bottom: 20px;
+}
+
+.nav_li a {
+  text-decoration: none;
+  color: #fff;
+  font-weight: bold;
+  padding: 10px 20px; /* Increased padding for better clickability */
+  border-radius: 5px; /* Added border radius for rounded corners */
+  transition: background-color 0.3s ease; /* Smooth hover transition */
+}
+
+/* Hover effect for navigation links */
+.nav_li:hover a {
+  background-color: #3d485b; /* Darker background color on hover */
+}
+
+/* User icon */
+.user_icon {
+  width: 24px;
+  height: 24px;
+  color: #fff;
+  margin-left: 10px;
+}
+
+/* Additional styles for better interaction */
+.nav_li a:active {
+  transform: translateY(1px); /* Add a slight downward shift on active state */
+}
+
+.nav_li a:focus {
+  outline: none; /* Remove default focus outline */
+}
+
+/* Header.module.css */
+
+.buttonAsLink {
+  background: none;
+  color: inherit;
+  border: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+  outline: inherit;
+  color: #fff;
+}
+/* Apply hover effect to buttons */
+.buttonAsLink:hover {
+  text-decoration: none;
+  color: #fff;
+  font-weight: bold;
+  padding: 0 0; /* Increased padding for better clickability */
+  border-radius: 5px; /* Added border radius for rounded corners */
+  transition: background-color 0.3s ease; /* Smooth hover transition */
+}
+
+/* Apply hover effect to ConnectButton */
+.connectButton:hover {
+  background: none;
+  color: inherit;
+  border: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+  outline: inherit;
+  color: #fff;
+}
+
+.logo {
+  margin: 10%;
+  text-decoration: none;
+  color: inherit;
+  font-size: 24px;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 10px 20px; /* Add padding for better spacing */
+  border-radius: 10px; /* Add border-radius for rounded corners */
+  background-color: #1d1d1d; /* Add background color */
+  transition: background-color 0.3s ease; /* Add transition for smooth hover effect */
+}
+
+.logo:hover {
+
+  color: #7e7e80; /* Change text color on hover */
+}

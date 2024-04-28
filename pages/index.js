@@ -1,12 +1,24 @@
 import Head from "next/head";
 import styles from "../styles/Home.module.css";
-
+import { useState, useEffect } from "react"; // Import useState and useEffect hooks
 import Header from "../components/header";
-import Main from "../components/main";
 import LoggedIn from "../components/loggedIn";
 import ShowPrice from "../components/showprice";
+import { useAccount } from "wagmi";
+import TransactionMonitor from "../components/TransactionMonitor";
 
 export default function Home() {
+  const { isConnected } = useAccount();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    if (isConnected) {
+      setIsLoggedIn(true);
+    } else {
+      setIsLoggedIn(false);
+    }
+  }, [isConnected]);
+
   return (
     <section className={styles.container}>
       <Head>
@@ -16,9 +28,11 @@ export default function Home() {
       </Head>
 
       <main className={styles.main}>
-    
-        <Header />
-        <LoggedIn /> 
+        {/* Conditionally render the Header component */}
+        {isLoggedIn && <Header >
+          {/* <TransactionMonitor /> */}
+        </Header>}
+        <LoggedIn />
       </main>
     </section>
   );
