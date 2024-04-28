@@ -58,7 +58,7 @@ export default function Header() {
     <section className={styles.header}>
       <div className={styles.logo}>
         <Link href="/">
-          Wallet Tracker
+          Portfolio Tracker
         </Link>
       </div>
       <section className={styles.nav}>
