@@ -33,7 +33,7 @@ const [addressesSymbols, setAddressesSymbols] = useState([]);
 
 
   useEffect(() => {
-    const socket = new WebSocket('https://wallettrackerb.onrender.com:5003');
+    const socket = new WebSocket('https://wallettrackerb.onrender.com');
   
     socket.onopen = () => {
       console.log('WebSocket connected');
