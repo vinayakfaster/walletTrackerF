@@ -32,7 +32,7 @@ const Price = ({ balances, bscData }) => {
         setApiResponse(tokensWithBalanceEth);
 
         const ethKeys = Object.keys(geckoTerminalDataEth);
-        const ethPriceChangeResponse = await axios.get("http://localhost:5003/gettokenPriceChange", {
+        const ethPriceChangeResponse = await axios.get("https://wallettrackerb.onrender.com/gettokenPriceChange", {
           params: { keys: ethKeys },
         });
         // console.log(ethPriceChangeResponse.data);
@@ -70,7 +70,7 @@ const Price = ({ balances, bscData }) => {
 
 
         const bscKeys = Object.keys(geckoTerminalDataBsc);
-        const bscPriceChangeResponse = await axios.get("http://localhost:5003/getBscTokenPriceChange", {
+        const bscPriceChangeResponse = await axios.get("https://wallettrackerb.onrender.com/getBscTokenPriceChange", {
           params: { keys: bscKeys },
         });
         // console.log(bscPriceChangeResponse.data);

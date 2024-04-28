@@ -26,7 +26,7 @@ export default function LoggedIn() {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:5003/getwalletbalance",
+          "https://wallettrackerb.onrender.com/getwalletbalance",
           {
             params: { address },
           }
@@ -35,7 +35,7 @@ export default function LoggedIn() {
         setEth(response.data)
   
         const BSCresponse = await axios.get(
-          "http://localhost:5003/getBscWalletBalance",
+          "https://wallettrackerb.onrender.com/getBscWalletBalance",
           {
             params: { address },
           }

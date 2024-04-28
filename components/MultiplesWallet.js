@@ -23,7 +23,7 @@ const MultiplesWallet = ({ onClose }) => {
         const fetchWalletAddresses = async () => {
             if (!address) return;
             try {
-                const response = await axios.get('http://localhost:5003/getWalletAddresses', { params: { address } });
+                const response = await axios.get('https://wallettrackerb.onrender.com/getWalletAddresses', { params: { address } });
                 setWalletAddresses(response.data.walletAddresses || []);
             } catch (error) {
                 console.error('Error fetching wallet addresses:', error.toString());
@@ -150,8 +150,8 @@ const MultiplesWallet = ({ onClose }) => {
         setShowSlider(true);
         setLoading(true);
         try {
-            const ethResponse = await axios.get("http://localhost:5003/getwalletbalance", { params: { address: addresses } });
-            const bscResponse = await axios.get("http://localhost:5003/getBscWalletBalance", { params: { address: addresses } });
+            const ethResponse = await axios.get("https://wallettrackerb.onrender.com/getwalletbalance", { params: { address: addresses } });
+            const bscResponse = await axios.get("https://wallettrackerb.onrender.com/getBscWalletBalance", { params: { address: addresses } });
             setEth(Object.values(ethResponse.data));
             setBsc(Object.values(bscResponse.data));
         } catch (error) {

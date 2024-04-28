@@ -27,7 +27,7 @@ const ShowFav = ({ onClose }) => {
     const fetchWalletAddresses = async () => {
       if (!address) return;
       try {
-        const response = await axios.get('http://localhost:5003/getFav', {
+        const response = await axios.get('https://wallettrackerb.onrender.com/getFav', {
           params: { address },
         });
         const favTokens = response.data.tokens;
@@ -60,7 +60,7 @@ const ShowFav = ({ onClose }) => {
 
   const handleRemoveWallet = async (addressToRemove) => {
     try {
-      await axios.get("http://localhost:5003/removeFavAddress", {
+      await axios.get("https://wallettrackerb.onrender.com/removeFavAddress", {
         params: { address, addressToRemove },
       });
       // Update the token array after successful removal

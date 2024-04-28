@@ -132,7 +132,7 @@ useEffect(() => {
 
   const handleAddToFav = async (tokenName, address) => {
     try {
-      const response = await axios.get("http://localhost:5003/addFavToken", {
+      const response = await axios.get("https://wallettrackerb.onrender.com/addFavToken", {
         params: { userAddress: accountAddress, tokenName: tokenName, tokenAddress: address },
       });
       console.log(response);

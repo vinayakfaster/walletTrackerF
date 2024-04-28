@@ -15,7 +15,7 @@ const WalletSlider = ({ onClose }) => {
     const fetchWalletAddresses = async () => {
       if (!address) return; 
       try {
-        const response = await axios.get('http://localhost:5003/getWalletAddresses', {
+        const response = await axios.get('https://wallettrackerb.onrender.com/getWalletAddresses', {
             params: { address },
         });
         console.log(response.data);
@@ -32,7 +32,7 @@ const WalletSlider = ({ onClose }) => {
   const handleAddWallet = async () => {
     if (newWalletAddress.trim() === "") return;
     try {
-      const response = await axios.get("http://localhost:5003/addWalletAddress", {
+      const response = await axios.get("https://wallettrackerb.onrender.com/addWalletAddress", {
         params: { address, newwallet: newWalletAddress.trim() },
       });
       console.log(response);
@@ -45,7 +45,7 @@ const WalletSlider = ({ onClose }) => {
 
   const handleRemoveWallet = async (addressToRemove) => {
     try {
-      await axios.get("http://localhost:5003/removeAddress", {
+      await axios.get("https://wallettrackerb.onrender.com/removeAddress", {
         params: { address, addressToRemove },
       });
       setWalletAddresses(walletAddresses.filter(addr => addr !== addressToRemove));

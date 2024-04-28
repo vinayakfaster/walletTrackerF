@@ -18,7 +18,7 @@ const TokenDetail = ({ tokenName, activeTab, onClose, baseTokenAddress }) => {
         if (!baseTokenAddress) return;
 
       
-        const transferResponse = await axios.get("http://localhost:5003/transfers", {
+        const transferResponse = await axios.get("https://wallettrackerb.onrender.com/transfers", {
           params: { tokenAddress: baseTokenAddress, walletAddress: "0x4e6FB88e48711d9f692942304D48A3aFc843e99A" }
         });
 
@@ -60,7 +60,7 @@ const TokenDetail = ({ tokenName, activeTab, onClose, baseTokenAddress }) => {
     const fetchHolderData = async () => {
       if (!baseTokenAddress || !tokenDetail) return;
       try {
-        const holdersResponse = await axios.get("http://localhost:5003/holders", {
+        const holdersResponse = await axios.get("https://wallettrackerb.onrender.com/holders", {
           params: { contractAddress: baseTokenAddress }
         });
 
